@@ -1,0 +1,3 @@
+run_bot.sh
+node_modules
+*.sh

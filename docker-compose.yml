@@ -1,0 +1,7 @@
+version: '3'
+services:
+  cruzeirorss:
+    build: .
+    image: cruzeirorss
+    volumes:
+      - ../twitter:/cruzeirorss

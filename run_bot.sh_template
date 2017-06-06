@@ -1,0 +1,3 @@
+#!/bin/sh
+export BOT_TOKEN='YOUR_BOT_TOKEN'
+exec npm start
