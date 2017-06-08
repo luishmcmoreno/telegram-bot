@@ -75,10 +75,14 @@ function aprovar(ctx) {
     }
     console.log(ctx.from, 'Aceitou notícia: ', id)
     var db = new sqlite3.Database(db_file);
-    db.run('update rss set aprovado = ? where rowid = ?', [1, id]);
-    db.close();
-
-    return ctx.reply('Aprovou notícia: ' + id)
+    db.run('update rss set aprovado = ? where rowid = ?', [1, id], function (err) {
+        if (!err) {
+            ctx.reply('Aprovou notícia: ' + id);
+        } else {
+            ctx.reply('Houve um erro no BD e não foi possível aprovar a notícia ' + id);
+        }
+        db.close();
+    });
 }
 
 app.command('aprovar', (ctx) => {
