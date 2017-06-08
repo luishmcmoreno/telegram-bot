@@ -5,13 +5,18 @@ var db_file = '/cruzeirorss/rss.db';
 
 function update_news() {
     return new Promise(function (resolve, reject) {
-        var news = [];
+        var obj = {
+            news: [],
+            opts: []
+        }
         var db = new sqlite3.Database(db_file);
         db.serialize(function() {
             db.each("select rowid as id, texto from rss where aprovado = 0 order by id;", function (err, row) {
-                news.push(row.id + ": " + row.texto);
+                obj.news.push(row.id + ": " + row.texto);
+                obj.opts.push(["/aprovar " + row.id, "/rejeitar " + row.id])
+
             }, function() {
-                resolve(news);
+                resolve(obj);
             });
         });
         db.close();
@@ -109,11 +114,21 @@ app.command('list@CruzeiroRssBot', (ctx) => {
 });
 
 function send_news() {
-    update_news().then(function (news) {
-        news.forEach(function(e, i, a) {
+    update_news().then(function (obj) {
+        obj.news.forEach(function(e, i, a) {
             //console.log(e);
             app.telegram.sendMessage(-169305907, e);
         });
+
+        setTimeout(function() {
+    app.telegram.sendMessage(-169305907, text="Use o menu para avaliar:",
+        reply_markup=Telegraf.Markup.keyboard(obj.opts)
+        .oneTime()
+        .resize()
+        .extra(),
+        disable_notification = true
+    )}, 2000);
+
     }).catch(function (err) {
         return ctx.reply(err)
         // TRATAR ERRO... POSSL ERRO DE COM BANCO, POR EXEMPLO
